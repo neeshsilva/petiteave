@@ -1,0 +1,61 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+            <h2 id="jhi-feedback-heading">Create or edit a Feedback</h2>
+
+            <div>
+                <jhi-alert-error></jhi-alert-error>
+
+                <div *ngIf="this.editForm.get(['product'])!.value">
+                    <a *ngIf="this.editForm.get(['product'])!.value.image" (click)="openFile(this.editForm.get(['product'])!.value.imageContentType, this.editForm.get(['product'])!.value.image)">
+                        <img [src]="'data:' + this.editForm.get(['product'])!.value.imageContentType + ';base64,' + this.editForm.get(['product'])!.value.image" style="max-height: 120px;" alt="product image"/>
+                    </a>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-control-label" for="field_feedback">Feedback</label>
+                    <textarea class="form-control" name="feedback" id="field_feedback"
+                              formControlName="feedback"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-control-label" for="field_like">Like</label>
+                    <select class="form-control" name="like" formControlName="like" id="field_like">
+                        <option value="Yes">Yes</option>
+                        <option value="Somewhat">Somewhat</option>
+                        <option value="No">No</option>
+                        <option value="Please_Select">Please_Select</option>
+                    </select>
+                </div>
+
+                <div class="form-group" *jhiHasAnyAuthority="'ROLE_ADMIN'">
+                    <label class="form-control-label" for="field_customer">Customer</label>
+                    <select class="form-control" id="field_customer" name="customer" formControlName="customer">
+                        <option [ngValue]="null"></option>
+                        <option [ngValue]="customerOption.id === editForm.get('customer')!.value?.id ? editForm.get('customer')!.value : customerOption" *ngFor="let customerOption of customers; trackBy: trackById" >{{customerOption.name }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group" *jhiHasAnyAuthority="'ROLE_ADMIN'">
+                    <label class="form-control-label" for="field_product">Product</label>
+                    <select class="form-control" id="field_product" name="product" formControlName="product">
+                        <option [ngValue]="null"></option>
+                        <option [ngValue]="productOption.id === editForm.get('product')!.value?.id ? editForm.get('product')!.value : productOption" *ngFor="let productOption of products; trackBy: trackById" >{{ productOption.name}}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
+                    <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+                </button>
+
+                <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+                    <button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-primary">
+                        <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+                    </button>
+                </form>
+            </div>
+        </form>
+    </div>
+</div>

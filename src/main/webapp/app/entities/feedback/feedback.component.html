@@ -1,0 +1,100 @@
+<div>
+    <h2 id="page-heading">
+        <span>Feedbacks</span>
+
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-feedback"
+                [routerLink]="['/feedback/new']" *jhiHasAnyAuthority="'ROLE_ADMIN'">
+            <fa-icon icon="plus"></fa-icon>
+            <span>
+            Create a new Feedback
+            </span>
+        </button>
+    </h2>
+
+    <jhi-alert-error></jhi-alert-error>
+
+    <jhi-alert></jhi-alert>
+
+    <div class="alert alert-warning" id="no-result" *ngIf="feedbacks?.length === 0">
+        <span>No feedbacks found</span>
+    </div>
+
+    <td class="table-responsive" id="entities" *ngIf="feedbacks && feedbacks.length > 0">
+        <table class="table table-striped" aria-describedby="page-heading">
+            <thead>
+            <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="loadPage.bind(this)">
+                <th scope="col" jhiSortBy="id" *jhiHasAnyAuthority="'ROLE_ADMIN'"><span>ID</span>
+                    <fa-icon icon="sort"></fa-icon>
+                </th>
+                <th scope="col" jhiSortBy="customer.name" *jhiHasAnyAuthority="'ROLE_ADMIN'"><span>Customer</span>
+                    <fa-icon icon="sort"></fa-icon>
+                </th>
+                <th scope="col" jhiSortBy="product.name"><span>Product</span>
+                    <fa-icon icon="sort"></fa-icon>
+                </th>
+                <th scope="col" jhiSortBy="like"><span>Like</span>
+                    <fa-icon icon="sort"></fa-icon>
+                </th>
+                <th scope="col" jhiSortBy="feedback"><span>Feedback</span>
+                    <fa-icon icon="sort"></fa-icon>
+                </th>
+                <th scope="col">
+                    <span>Filter by customer</span><input type="search" class="form-control" [(ngModel)]="filter"></th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let feedback of (feedbacks | pureFilter:filter:'name') ;trackBy: trackId">
+                <td *jhiHasAnyAuthority="'ROLE_ADMIN'"><a
+                        [routerLink]="['/feedback', feedback.id, 'view']">{{ feedback.id }}</a></td>
+                <td *jhiHasAnyAuthority="'ROLE_ADMIN'">
+                    <div *ngIf="feedback.customer">
+                        <a [routerLink]="['/customer', feedback.customer?.id, 'view']">{{ feedback.customer?.name }}</a>
+                    </div>
+                </td>
+                <td>
+                    <div *ngIf="feedback.product">
+                        <a *ngIf="feedback.product.image"
+                           (click)="openFile(feedback.product.imageContentType, feedback.product.image)">
+                            <img [src]="'data:' + feedback.product.imageContentType + ';base64,' + feedback.product.image"
+                                 style="max-height: 80px;" alt="product image"/>
+                        </a>
+                    </div>
+                </td>
+                <td>{{ feedback.like }}</td>
+                <td>{{ feedback.feedback }}</td>
+                <td class="text-right">
+                    <div class="btn-group">
+
+                        <button type="submit"
+                                [routerLink]="['/feedback', feedback.id, 'edit']"
+                                class="btn btn-primary btn-sm">
+                            <fa-icon icon="pencil-alt"></fa-icon>
+                            <span class="d-none d-md-inline">Create Feedback</span>
+                        </button>
+
+                        <button type="submit" (click)="delete(feedback)"
+                                class="btn btn-danger btn-sm"
+                                *jhiHasAnyAuthority="'ROLE_ADMIN'">
+                            <fa-icon icon="times"></fa-icon>
+                            <span class="d-none d-md-inline">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+</div>
+
+<div *ngIf="feedbacks && feedbacks.length > 0">
+    <div class="row justify-content-center">
+        <jhi-item-count [page]="page" [total]="totalItems" [itemsPerPage]="itemsPerPage"></jhi-item-count>
+    </div>
+
+    <div class="row justify-content-center">
+        <ngb-pagination [collectionSize]="totalItems" [(page)]="ngbPaginationPage" [pageSize]="itemsPerPage"
+                        [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
+                        (pageChange)="loadPage($event)"></ngb-pagination>
+    </div>
+</div>
+
