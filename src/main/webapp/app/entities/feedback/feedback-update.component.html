@@ -4,8 +4,11 @@
             <h2 id="jhi-feedback-heading">Create or edit a Feedback</h2>
 
             <div>
-                <jhi-alert-error></jhi-alert-error>
+                <!--                <jhi-alert-error></jhi-alert-error>-->
 
+                <div class="alert alert-danger" *ngIf="authenticationError">
+                    <strong>Invalid!</strong> Product or Customer.
+                </div>
                 <div *ngIf="this.editForm.get(['product'])!.value">
                     <a *ngIf="this.editForm.get(['product'])!.value.image"
                        (click)="openFile(this.editForm.get(['product'])!.value.imageContentType, this.editForm.get(['product'])!.value.image)">
@@ -32,23 +35,15 @@
 
                 <div class="form-group" *jhiHasAnyAuthority="'ROLE_ADMIN'">
                     <label class="form-control-label" for="field_customer">Customer</label>
-                    <!--                    <input class="form-control" name="customer" id="field_customer" formControlName="customer">-->
-                    <select class="form-control" id="field_customer" name="customer" formControlName="customer">
-                        <option [ngValue]="null"></option>
-                        <option [ngValue]="customerOption.id === editForm.get('customer')!.value?.id ? editForm.get('customer')!.value : customerOption"
-                                *ngFor="let customerOption of customers; trackBy: trackById">{{customerOption.name }}</option>
-                    </select>
+                    <input class="form-control" name="customer" id="field_customer" formControlName="customer">
+
                 </div>
                 `
 
                 <div class="form-group" *jhiHasAnyAuthority="'ROLE_ADMIN'">
                     <label class="form-control-label" for="field_product">Product</label>
-                    <!--                    <input class="form-control" name="product" id="field_product" formControlName="product">-->
-                    <select class="form-control" id="field_product" name="product" formControlName="product">
-                        <option [ngValue]="null"></option>
-                        <option [ngValue]="productOption.id === editForm.get('product')!.value?.id ? editForm.get('product')!.value : productOption"
-                                *ngFor="let productOption of products; trackBy: trackById">{{ productOption.name}}</option>
-                    </select>
+                    <input class="form-control" name="product" id="field_product" formControlName="product">
+
                 </div>
             </div>
 

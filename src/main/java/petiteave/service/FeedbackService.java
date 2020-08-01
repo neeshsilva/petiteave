@@ -1,5 +1,6 @@
 package petiteave.service;
 
+import petiteave.domain.Customer;
 import petiteave.domain.Feedback;
 import petiteave.repository.FeedbackRepository;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import petiteave.security.AuthoritiesConstants;
 import petiteave.security.SecurityUtils;
+
 
 import java.util.Optional;
 
@@ -85,5 +87,11 @@ public class FeedbackService {
     public void delete(Long id) {
         log.debug("Request to delete Feedback : {}", id);
         feedbackRepository.deleteById(id);
+    }
+
+    public void getCustomer(Customer customerObj){
+
+
+
     }
 }

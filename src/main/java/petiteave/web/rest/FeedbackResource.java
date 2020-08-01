@@ -1,7 +1,10 @@
 package petiteave.web.rest;
 
-import org.springframework.security.access.prepost.PreAuthorize;
+import petiteave.domain.Customer;
 import petiteave.domain.Feedback;
+import petiteave.domain.Product;
+import petiteave.service.CustomerService;
+import petiteave.service.ProductService;
 import petiteave.service.FeedbackService;
 import petiteave.web.rest.errors.BadRequestAlertException;
 
@@ -14,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,13 +37,21 @@ public class FeedbackResource {
 
     private static final String ENTITY_NAME = "feedback";
 
+    private ProductService productService;
+
+    private CustomerService customerService;
+
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
     private final FeedbackService feedbackService;
 
-    public FeedbackResource(FeedbackService feedbackService) {
+    public FeedbackResource(FeedbackService feedbackService, ProductService productService, CustomerService customerService) {
+
+
         this.feedbackService = feedbackService;
+        this.productService = productService;
+        this.customerService = customerService;
     }
 
     /**
@@ -53,15 +63,25 @@ public class FeedbackResource {
      */
     @PostMapping("/feedbacks")
     public ResponseEntity<Feedback> createFeedback(@RequestBody Feedback feedback) throws URISyntaxException {
-        log.debug("Fields ",feedback.getCustomer());
+
         log.debug("REST request to save Feedback : {}", feedback);
+        Product product = productService.validateProduct(feedback.getProduct());
+
+        if (product.getId() != null) {
+            feedback.setProduct(product);
+        }
+        Customer customer = customerService.validateCustomer(feedback.getCustomer());
+
+        if (customer.getId() != null) {
+            feedback.setCustomer(customer);
+        }
         if (feedback.getId() != null) {
             throw new BadRequestAlertException("A new feedback cannot already have an ID", ENTITY_NAME, "idexists");
         }
         Feedback result = feedbackService.save(feedback);
         return ResponseEntity.created(new URI("/api/feedbacks/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+                .body(result);
     }
 
     /**
@@ -74,15 +94,29 @@ public class FeedbackResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/feedbacks")
+
     public ResponseEntity<Feedback> updateFeedback(@RequestBody Feedback feedback) throws URISyntaxException {
+
         log.debug("REST request to update Feedback : {}", feedback);
+
+        Product product = productService.validateProduct(feedback.getProduct());
+
+        if (product.getId() != null) {
+            feedback.setProduct(product);
+        }
+        Customer customer = customerService.validateCustomer(feedback.getCustomer());
+
+        if (customer.getId() != null) {
+            feedback.setCustomer(customer);
+        }
+
         if (feedback.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         Feedback result = feedbackService.save(feedback);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, feedback.getId().toString()))
-            .body(result);
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, feedback.getId().toString()))
+                .body(result);
     }
 
     /**

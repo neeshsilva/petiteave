@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {HttpResponse} from '@angular/common/http';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 import {FormBuilder, Validators} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs';
@@ -24,6 +24,8 @@ export class FeedbackUpdateComponent implements OnInit {
     isSaving = false;
     customers: ICustomer[] = [];
     products: IProduct[] = [];
+    errorMsg = "";
+    authenticationError: boolean = false;
 
     customerProduct = true;
 
@@ -45,6 +47,7 @@ export class FeedbackUpdateComponent implements OnInit {
         private fb: FormBuilder
     ) {
     }
+
 
     ngOnInit(): void {
         this.activatedRoute.data.subscribe(({feedback}) => {
@@ -99,62 +102,26 @@ export class FeedbackUpdateComponent implements OnInit {
 
     private createFromForm(): IFeedback {
 
-        // console.log("Customer ", this.getCustomerData());
-        // console.log("Product ", this.getProductData());
+        let customerObj: ICustomer = {name: this.editForm.get(['customer'])!.value};
+        let productObj: IProduct = {name: this.editForm.get(['product'])!.value};
 
         return {
             ...new Feedback(),
             id: this.editForm.get(['id'])!.value,
             feedback: this.editForm.get(['feedback'])!.value,
             like: this.editForm.get(['like'])!.value,
-            // customer: this.getCustomerData(),
-            // product: this.getProductData(),
-
-            customer: this.editForm.get(['customer'])!.value,
-            product: this.editForm.get(['product'])!.value,
+            customer: customerObj,
+            product: productObj,
         };
-    }
-
-    private getProductData(): IProduct {
-
-        let product: IProduct = {};
-        let productName = this.editForm.get(['product'])!.value;
-        for (let productData of this.products) {
-            if (productData.name === productName) {
-                product = productData;
-                this.customerProduct = true;
-                return productData;
-            } else {
-                new JhiEventWithContent<AlertError>('Feed Back error',{message:'Product not found'});
-                this.onSaveError();
-            }
-        }
-        return productName;
-    }
-
-    private getCustomerData(): ICustomer {
-        let customer: ICustomer = {};
-        let customerName = this.editForm.get(['customer'])!.value;
-
-        for (let customerData of this.customers) {
-            if (customerData.name === customerName) {
-                customer = customerData;
-                this.customerProduct = true;
-                return customerData;
-            } else {
-                new JhiEventWithContent<AlertError>('Feed Back error',{message:'Product not found'});
-                this.onSaveError();
-
-            }
-        }
-        return customerName;
-
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IFeedback>>): void {
         result.subscribe(
             () => this.onSaveSuccess(),
-            () => this.onSaveError()
+            err => {
+                this.errorMsg = JSON.stringify(err);
+                this.onSaveError();
+            }
         );
     }
 
@@ -165,6 +132,7 @@ export class FeedbackUpdateComponent implements OnInit {
 
     protected onSaveError(): void {
         this.isSaving = false;
+        this.authenticationError = true;
     }
 
     trackById(index: number, item: SelectableEntity): any {
