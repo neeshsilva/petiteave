@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { JhiEventManager, JhiAlert, JhiAlertService, JhiEventWithContent } from 'ng-jhipster';
 import { Subscription } from 'rxjs';
 
-import { AlertError } from './alert-error.model';
+import { AlertError } from './alert-error.model';3
 
 @Component({
   selector: 'jhi-alert-error',

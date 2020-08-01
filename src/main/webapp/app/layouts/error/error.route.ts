@@ -30,6 +30,24 @@ export const errorRoute: Routes = [
     },
   },
   {
+    path: '400/customer',
+    component: ErrorComponent,
+    data: {
+      authorities: [],
+      pageTitle: 'Error page!',
+      errorMessage: 'Customer Does not exist.',
+    }
+  },
+  {
+    path: '400/product',
+    component: ErrorComponent,
+    data: {
+      authorities: [],
+      pageTitle: 'Error page!',
+      errorMessage: 'Product Does not exist.',
+    }
+  },
+  {
     path: '**',
     redirectTo: '/404',
   },

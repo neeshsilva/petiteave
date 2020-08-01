@@ -53,6 +53,7 @@ public class FeedbackResource {
      */
     @PostMapping("/feedbacks")
     public ResponseEntity<Feedback> createFeedback(@RequestBody Feedback feedback) throws URISyntaxException {
+        log.debug("Fields ",feedback.getCustomer());
         log.debug("REST request to save Feedback : {}", feedback);
         if (feedback.getId() != null) {
             throw new BadRequestAlertException("A new feedback cannot already have an ID", ENTITY_NAME, "idexists");
